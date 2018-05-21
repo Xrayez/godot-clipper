@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2017 Andrii Doroshenko
+Copyright (c) 2018 Andrii Doroshenko
 
 Clipper C++ library license: [lib/LICENSE.md](lib/LICENSE.md)
 

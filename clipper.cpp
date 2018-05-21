@@ -1,33 +1,23 @@
-#include "clipper.hpp"
+#include "clipper.h"
 
 void Clipper::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("get_version"), &Clipper::get_version);
 
-    BIND_CONSTANT(INTERSECTION);
-    BIND_CONSTANT(UNION);
-    BIND_CONSTANT(DIFFERENCE);
-    BIND_CONSTANT(XOR);
+    using namespace clipperlib;
+    // Use namespace declaration to avoid having
+    // prepended namespace name in enum constants
+    BIND_ENUM_CONSTANT(ctNone);
+    BIND_ENUM_CONSTANT(ctIntersection);
+    BIND_ENUM_CONSTANT(ctUnion);
+    BIND_ENUM_CONSTANT(ctDifference);
+    BIND_ENUM_CONSTANT(ctXor);
 
-    BIND_CONSTANT(SUBJECT);
-    BIND_CONSTANT(CLIP);
+    BIND_ENUM_CONSTANT(ptSubject);
+    BIND_ENUM_CONSTANT(ptClip);
 
-    BIND_CONSTANT(EVEN_ODD);
-    BIND_CONSTANT(NON_ZERO);
-    BIND_CONSTANT(POSITIVE);
-    BIND_CONSTANT(NEGATIVE);
-
-    BIND_CONSTANT(REVERSE_SOLUTION);
-    BIND_CONSTANT(STRICTLY_SIMPLE);
-    BIND_CONSTANT(PRESERVE_COLLINEAR);
-
-    BIND_CONSTANT(SQUARE);
-    BIND_CONSTANT(ROUND);
-    BIND_CONSTANT(MITER);
-
-    BIND_CONSTANT(CLOSED_POLYGON);
-    BIND_CONSTANT(CLOSED_LINE);
-    BIND_CONSTANT(OPEN_BUTT);
-    BIND_CONSTANT(OPEN_SQUARE);
-    BIND_CONSTANT(OPEN_ROUND);
+    BIND_ENUM_CONSTANT(frEvenOdd);
+    BIND_ENUM_CONSTANT(frNonZero);
+    BIND_ENUM_CONSTANT(frPositive);
+    BIND_ENUM_CONSTANT(frNegative);
 }

@@ -1,4 +1,3 @@
 *.cpp eol=lf
-*.hpp eol=lf
 *.h eol=lf
 *.py eol=lf

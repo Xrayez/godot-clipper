@@ -1,5 +1,5 @@
 #include "register_types.h"
-#include "clipper.hpp"
+#include "clipper.h"
 
 void register_clipper_types() {
 
