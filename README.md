@@ -5,7 +5,19 @@
 This is a wrapper for the popular polygon clipping library originally written by
 Angus Johnson: [Clipper](https://sourceforge.net/projects/polyclipping/)
 
-Currently has no useful methods wrapped yet, sorry! Consider contributing?
+Currently you'll find three Clipper modules combined:
+
+* Clipper
+* ClipperOffset
+* ClipperTri
+
+Not sure about this structure, perhaps it would be easier to define several
+classes for each Clipper's module, might create some complexity.
+
+## Todo
+
+- [ ] Add ability to construct PolyPaths;
+- [ ] Safe mode switching
 
 ## Notice
 
