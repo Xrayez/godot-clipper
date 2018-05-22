@@ -40,6 +40,7 @@ public:
 //------------------------------------------------------------------------------
     // Path and execute configuration, define these before adding new paths
     // Each path added will have the same configuration as the previous one
+    // Define parameters that are relevant to particular operation
 
     void set_open(bool p_is_open) { open = p_is_open; }
     bool is_open() const { return open; }

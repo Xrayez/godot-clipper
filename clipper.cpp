@@ -115,6 +115,8 @@ void Clipper::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("clear"), &Clipper::clear);
 
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "mode"), "set_mode", "get_mode");
+
 //------------------------------------------------------------------------------
 // Configuration methods
 //------------------------------------------------------------------------------
@@ -138,6 +140,14 @@ void Clipper::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("set_delta", "delta"), &Clipper::set_delta);
     ClassDB::bind_method(D_METHOD("get_delta"), &Clipper::get_delta);
+
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "open"), "set_open", "is_open");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "path_type"), "set_path_type", "get_path_type");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "clip_type"), "set_clip_type", "get_clip_type");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "join_type"), "set_join_type", "get_join_type");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "end_type"), "set_end_type", "get_end_type");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "fill_rule"), "set_fill_rule", "get_fill_rule");
+    ADD_PROPERTY(PropertyInfo(Variant::REAL, "delta"), "set_delta", "get_delta");
 
 //------------------------------------------------------------------------------
 // Meta methods
