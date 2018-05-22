@@ -63,15 +63,15 @@ int Clipper::get_solution_count() const {
 
 Vector<Vector2> Clipper::get_solution(int idx) {
 
-    ERR_EXPLAIN("Solution not found");
+    ERR_EXPLAIN("Clipping solution not found");
     ERR_FAIL_INDEX_V(idx, solution_closed.size(), Vector<Vector2>());
 
-    Vector<Vector2> points = _scale_down(solution_closed[idx], PRECISION);
+    const Vector<Vector2>& points = _scale_down(solution_closed[idx], PRECISION);
 
     return points;
 }
 
-cl::Path Clipper::_scale_up(const Vector<Vector2>& points, real_t scale) {
+_FORCE_INLINE_ cl::Path Clipper::_scale_up(const Vector<Vector2>& points, real_t scale) {
 
     cl::Path path;
     path.resize(points.size());
@@ -85,7 +85,7 @@ cl::Path Clipper::_scale_up(const Vector<Vector2>& points, real_t scale) {
     return path;
 }
 
-Vector<Vector2> Clipper::_scale_down(const cl::Path& path, real_t scale) {
+_FORCE_INLINE_ Vector<Vector2> Clipper::_scale_down(const cl::Path& path, real_t scale) {
 
     Vector<Vector2> points;
     points.resize(path.size());
