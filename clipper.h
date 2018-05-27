@@ -31,6 +31,7 @@ public:
     int get_solution_count() const;
     Vector<Vector2> get_solution(int idx);
 
+    Rect2 get_bounds();
     void clear();
 
 //------------------------------------------------------------------------------

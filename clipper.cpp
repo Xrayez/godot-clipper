@@ -74,6 +74,36 @@ Vector<Vector2> Clipper::get_solution(int idx) {
     return points;
 }
 
+Rect2 Clipper::get_bounds() {
+
+    ERR_EXPLAIN("Cannot get bounds in MODE_OFFSET");
+    ERR_FAIL_COND_V(mode == MODE_OFFSET, Rect2());
+
+    cl::Rect64 b(0,0,0,0);
+
+    switch(mode) {
+
+        case MODE_CLIP: {
+            b = cl.GetBounds();
+        } break;
+
+        case MODE_TRIANGULATE: {
+            b = ct.GetBounds();
+        } break;
+    }
+
+    cl::Point64 pos(b.left, b.top);
+    cl::Point64 size(b.right - b.left, b.bottom - b.top);
+
+    Rect2 bounds(
+        static_cast<real_t>(pos.x) / PRECISION,
+        static_cast<real_t>(pos.y) / PRECISION,
+        static_cast<real_t>(size.x) / PRECISION,
+        static_cast<real_t>(size.y) / PRECISION
+    );
+    return bounds;
+}
+
 void Clipper::set_mode(ClipMode p_mode, bool reuse_solution) {
 
     if(mode == p_mode)
@@ -132,7 +162,7 @@ _FORCE_INLINE_ Vector<Vector2> Clipper::_scale_down(const cl::Path& path, real_t
 void Clipper::_bind_methods() {
 
 //------------------------------------------------------------------------------
-// Clipping methods
+// Clipper methods
 //------------------------------------------------------------------------------
 
     ClassDB::bind_method(D_METHOD("add_points", "points"), &Clipper::add_points);
@@ -142,6 +172,10 @@ void Clipper::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_solution", "index"), &Clipper::get_solution);
 
     ClassDB::bind_method(D_METHOD("clear"), &Clipper::clear);
+
+    ClassDB::bind_method(D_METHOD("get_bounds"), &Clipper::get_bounds);
+
+    ADD_PROPERTY(PropertyInfo(Variant::RECT2, "bounds"), "", "get_bounds");
 
 //------------------------------------------------------------------------------
 // Configuration methods
