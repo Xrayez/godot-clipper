@@ -40,7 +40,7 @@ public:
     // Path and execute configuration, define these before adding new paths
     // Each path added will have the same configuration as the previous one
     // --------------------------------------------------------------------
-    void set_mode(ClipMode p_mode);
+    void set_mode(ClipMode p_mode, bool reuse_solution = true);
     ClipMode get_mode() const { return mode; }
 
     void set_open(bool p_is_open) { open = p_is_open; }
@@ -87,8 +87,6 @@ private:
     real_t delta;
 
     ClipMode mode;
-
-    cl::Paths paths_to_add;
 
     cl::Paths solution_closed;
     cl::Paths solution_open;

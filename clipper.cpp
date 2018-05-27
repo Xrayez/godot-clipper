@@ -15,7 +15,20 @@ void Clipper::add_points(const Vector<Vector2>& points) {
 
     const cl::Path& path = _scale_up(points, PRECISION);
 
-    paths_to_add.push_back(path);
+    switch(mode) {
+
+        case MODE_CLIP: {
+            cl.AddPath(path, path_type, open);
+        } break;
+
+        case MODE_OFFSET: {
+            co.AddPath(path, join_type, end_type);
+        } break;
+
+        case MODE_TRIANGULATE: {
+            ct.AddPath(path, path_type, open);
+        } break;
+    }
 }
 
 void Clipper::execute() {
@@ -23,27 +36,20 @@ void Clipper::execute() {
     switch(mode) {
 
         case MODE_CLIP: {
-            cl.AddPaths(paths_to_add, path_type, open);
             cl.Execute(clip_type, solution_closed, solution_open, fill_rule);
         } break;
 
         case MODE_OFFSET: {
-            co.AddPaths(paths_to_add, join_type, end_type);
             co.Execute(solution_closed, delta * PRECISION);
         } break;
 
         case MODE_TRIANGULATE: {
-            ct.AddPaths(paths_to_add, path_type, open);
             ct.Execute(clip_type, solution_closed, fill_rule);
         } break;
     }
-
-    paths_to_add.clear();
 }
 
 void Clipper::clear() {
-
-    paths_to_add.clear();
 
     solution_closed.clear();
     solution_open.clear();
@@ -68,9 +74,31 @@ Vector<Vector2> Clipper::get_solution(int idx) {
     return points;
 }
 
-void Clipper::set_mode(ClipMode p_mode) {
+void Clipper::set_mode(ClipMode p_mode, bool reuse_solution) {
+
+    if(mode == p_mode)
+        return;
 
     mode = p_mode;
+
+    if(reuse_solution) {
+
+        // Transfer resulted solution from previous execution
+        switch(mode) {
+
+            case MODE_CLIP: {
+                cl.AddPaths(solution_closed, path_type, open);
+            } break;
+
+            case MODE_OFFSET: {
+                co.AddPaths(solution_closed, join_type, end_type);
+            } break;
+
+            case MODE_TRIANGULATE: {
+                ct.AddPaths(solution_closed, path_type, open);
+            } break;
+        }
+    }
 }
 
 _FORCE_INLINE_ cl::Path Clipper::_scale_up(const Vector<Vector2>& points, real_t scale) {
@@ -106,8 +134,6 @@ void Clipper::_bind_methods() {
 //------------------------------------------------------------------------------
 // Clipping methods
 //------------------------------------------------------------------------------
-    ClassDB::bind_method(D_METHOD("set_mode", "mode"), &Clipper::set_mode);
-    ClassDB::bind_method(D_METHOD("get_mode"), &Clipper::get_mode);
 
     ClassDB::bind_method(D_METHOD("add_points", "points"), &Clipper::add_points);
     ClassDB::bind_method(D_METHOD("execute"), &Clipper::execute);
@@ -117,11 +143,12 @@ void Clipper::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("clear"), &Clipper::clear);
 
-    ADD_PROPERTY(PropertyInfo(Variant::INT, "mode"), "set_mode", "get_mode");
-
 //------------------------------------------------------------------------------
 // Configuration methods
 //------------------------------------------------------------------------------
+    ClassDB::bind_method(D_METHOD("set_mode", "mode", "reuse_solution"), &Clipper::set_mode, DEFVAL(true));
+    ClassDB::bind_method(D_METHOD("get_mode"), &Clipper::get_mode);
+
     ClassDB::bind_method(D_METHOD("set_open", "is_open"), &Clipper::set_open);
     ClassDB::bind_method(D_METHOD("is_open"), &Clipper::is_open);
 
@@ -131,24 +158,25 @@ void Clipper::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_clip_type", "clip_type"), &Clipper::set_clip_type);
     ClassDB::bind_method(D_METHOD("get_clip_type"), &Clipper::get_clip_type);
 
+    ClassDB::bind_method(D_METHOD("set_fill_rule", "fill_rule"), &Clipper::set_fill_rule);
+    ClassDB::bind_method(D_METHOD("get_fill_rule"), &Clipper::get_fill_rule);
+
     ClassDB::bind_method(D_METHOD("set_join_type", "join_type"), &Clipper::set_join_type);
     ClassDB::bind_method(D_METHOD("get_join_type"), &Clipper::get_join_type);
 
     ClassDB::bind_method(D_METHOD("set_end_type", "end_type"), &Clipper::set_end_type);
     ClassDB::bind_method(D_METHOD("get_end_type"), &Clipper::get_clip_type);
 
-    ClassDB::bind_method(D_METHOD("set_fill_rule", "fill_rule"), &Clipper::set_fill_rule);
-    ClassDB::bind_method(D_METHOD("get_fill_rule"), &Clipper::get_fill_rule);
-
     ClassDB::bind_method(D_METHOD("set_delta", "delta"), &Clipper::set_delta);
     ClassDB::bind_method(D_METHOD("get_delta"), &Clipper::get_delta);
 
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "mode"), "", "get_mode");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "open"), "set_open", "is_open");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "path_type"), "set_path_type", "get_path_type");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "clip_type"), "set_clip_type", "get_clip_type");
-    ADD_PROPERTY(PropertyInfo(Variant::INT, "join_type"), "set_join_type", "get_join_type");
-    ADD_PROPERTY(PropertyInfo(Variant::INT, "end_type"), "set_end_type", "get_end_type");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "fill_rule"), "set_fill_rule", "get_fill_rule");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "end_type"), "set_end_type", "get_end_type");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "join_type"), "set_join_type", "get_join_type");
     ADD_PROPERTY(PropertyInfo(Variant::REAL, "delta"), "set_delta", "get_delta");
 
 //------------------------------------------------------------------------------
