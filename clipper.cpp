@@ -15,20 +15,7 @@ void Clipper::add_points(const Vector<Vector2>& points) {
 
     const cl::Path& path = _scale_up(points, PRECISION);
 
-    switch(mode) {
-
-        case MODE_CLIP: {
-            cl.AddPath(path, path_type, open);
-        } break;
-
-        case MODE_OFFSET: {
-            co.AddPath(path, join_type, end_type);
-        } break;
-
-        case MODE_TRIANGULATE: {
-            ct.AddPath(path, path_type, open);
-        } break;
-    }
+    paths_to_add.push_back(path);
 }
 
 void Clipper::execute() {
@@ -36,20 +23,30 @@ void Clipper::execute() {
     switch(mode) {
 
         case MODE_CLIP: {
+            cl.AddPaths(paths_to_add, path_type, open);
             cl.Execute(clip_type, solution_closed, solution_open, fill_rule);
         } break;
 
         case MODE_OFFSET: {
+            co.AddPaths(paths_to_add, join_type, end_type);
             co.Execute(solution_closed, delta * PRECISION);
         } break;
 
         case MODE_TRIANGULATE: {
+            ct.AddPaths(paths_to_add, path_type, open);
             ct.Execute(clip_type, solution_closed, fill_rule);
         } break;
     }
+
+    paths_to_add.clear();
 }
 
 void Clipper::clear() {
+
+    paths_to_add.clear();
+
+    solution_closed.clear();
+    solution_open.clear();
 
     cl.Clear();
     co.Clear();
@@ -69,6 +66,11 @@ Vector<Vector2> Clipper::get_solution(int idx) {
     const Vector<Vector2>& points = _scale_down(solution_closed[idx], PRECISION);
 
     return points;
+}
+
+void Clipper::set_mode(ClipMode p_mode) {
+
+    mode = p_mode;
 }
 
 _FORCE_INLINE_ cl::Path Clipper::_scale_up(const Vector<Vector2>& points, real_t scale) {

@@ -24,8 +24,6 @@ public:
 //------------------------------------------------------------------------------
 // Clipping methods
 //------------------------------------------------------------------------------
-    void set_mode(ClipMode p_mode) { mode = p_mode; }
-    ClipMode get_mode() const { return mode; }
 
     void add_points(const Vector<Vector2>& points);
     void execute();
@@ -38,9 +36,12 @@ public:
 //------------------------------------------------------------------------------
 // Configuration methods
 //------------------------------------------------------------------------------
+
     // Path and execute configuration, define these before adding new paths
     // Each path added will have the same configuration as the previous one
-    // Define parameters that are relevant to particular operation
+    // --------------------------------------------------------------------
+    void set_mode(ClipMode p_mode);
+    ClipMode get_mode() const { return mode; }
 
     void set_open(bool p_is_open) { open = p_is_open; }
     bool is_open() const { return open; }
@@ -51,14 +52,16 @@ public:
     void set_clip_type(cl::ClipType p_clip_type) { clip_type = p_clip_type; }
     cl::ClipType get_clip_type() const { return clip_type; }
 
+    void set_fill_rule(cl::FillRule p_fill_rule) { fill_rule = p_fill_rule; }
+    cl::FillRule get_fill_rule() const { return fill_rule; }
+
+    // Only relevant in MODE_OFFSET
+    // ----------------------------
     void set_join_type(cl::JoinType p_join_type) { join_type = p_join_type; }
     cl::JoinType get_join_type() const { return join_type; }
 
     void set_end_type(cl::EndType p_end_type) { end_type = p_end_type; }
     cl::EndType get_end_type() const { return end_type; }
-
-    void set_fill_rule(cl::FillRule p_fill_rule) { fill_rule = p_fill_rule; }
-    cl::FillRule get_fill_rule() const { return fill_rule; }
 
     void set_delta(real_t p_delta) { delta = p_delta; }
     real_t get_delta() const { return delta; }
@@ -76,14 +79,16 @@ private:
     Vector<Vector2> _scale_down(const cl::Path& path, real_t scale);
 
     bool open;
-    cl::FillRule fill_rule;
     cl::PathType path_type;
-    cl::JoinType join_type;
     cl::ClipType clip_type;
+    cl::FillRule fill_rule;
+    cl::JoinType join_type;
     cl::EndType end_type;
     real_t delta;
 
     ClipMode mode;
+
+    cl::Paths paths_to_add;
 
     cl::Paths solution_closed;
     cl::Paths solution_open;
