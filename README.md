@@ -25,8 +25,10 @@ scons platform=windows target=release_debug bits=64
 ## Usage example
 
 ```gdscript
-var rect_1 = [Vector2(0, 0), Vector2(100, 0), Vector2(100, 100),Vector2(0, 100)]
-var rect_2 = [Vector2(50, 50), Vector2(150, 50), Vector2(150, 150),Vector2(50, 150)]
+var rect_1 = [Vector2(0, 0), Vector2(100, 0), Vector2(100, 100), Vector2(0, 100)]
+var rect_2 = [Vector2(50, 50), Vector2(150, 50), Vector2(150, 150), Vector2(50, 150)]
+
+var clipper = Clipper.new()
 
 clipper.set_mode(Clipper.MODE_CLIP)
 
