@@ -61,7 +61,23 @@ void Clipper::clear() {
 
 int Clipper::get_solution_count(SolutionType type) const {
 
-    return type ? solution_open.size() : solution_closed.size();
+    switch(type) {
+
+        case TYPE_CLOSED: {
+            return solution_closed.size();
+        } break;
+
+        case TYPE_OPEN: {
+            return solution_open.size();
+        } break;
+
+        case TYPE_HIERARCHY: {
+            ERR_EXPLAIN("TYPE_HIERARCHY reserved for future implementation");
+            ERR_FAIL_V(-1);
+            // to be implemented
+        }
+    }
+    return -1;
 }
 
 Vector<Vector2> Clipper::get_solution(int idx, SolutionType type) {
@@ -85,6 +101,8 @@ Vector<Vector2> Clipper::get_solution(int idx, SolutionType type) {
         } break;
 
         case TYPE_HIERARCHY: {
+            ERR_EXPLAIN("TYPE_HIERARCHY reserved for future implementation");
+            ERR_FAIL_V(Vector<Vector2>());
             // to be implemented
         }
     }
