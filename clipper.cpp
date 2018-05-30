@@ -59,19 +59,36 @@ void Clipper::clear() {
     ct.Clear();
 }
 
-int Clipper::get_solution_count() const {
+int Clipper::get_solution_count(SolutionType type) const {
 
-    return solution_closed.size();
+    return type ? solution_open.size() : solution_closed.size();
 }
 
-Vector<Vector2> Clipper::get_solution(int idx) {
+Vector<Vector2> Clipper::get_solution(int idx, SolutionType type) {
 
-    ERR_EXPLAIN("Clipping solution not found");
-    ERR_FAIL_INDEX_V(idx, solution_closed.size(), Vector<Vector2>());
+    switch(type) {
 
-    const Vector<Vector2>& points = _scale_down(solution_closed[idx], PRECISION);
+        case TYPE_CLOSED: {
 
-    return points;
+            ERR_EXPLAIN("Closed solution not found");
+            ERR_FAIL_INDEX_V(idx, solution_closed.size(), Vector<Vector2>());
+
+            return _scale_down(solution_closed[idx], PRECISION);
+        } break;
+
+        case TYPE_OPEN: {
+
+            ERR_EXPLAIN("Open solution not found");
+            ERR_FAIL_INDEX_V(idx, solution_open.size(), Vector<Vector2>());
+
+            return _scale_down(solution_open[idx], PRECISION);
+        } break;
+
+        case TYPE_HIERARCHY: {
+            // to be implemented
+        }
+    }
+    return Vector<Vector2>();
 }
 
 Rect2 Clipper::get_bounds() {
@@ -117,7 +134,8 @@ void Clipper::set_mode(ClipMode p_mode, bool reuse_solution) {
         switch(mode) {
 
             case MODE_CLIP: {
-                cl.AddPaths(solution_closed, path_type, open);
+                cl.AddPaths(solution_closed, path_type, false);
+                cl.AddPaths(solution_open, path_type, true);
             } break;
 
             case MODE_OFFSET: {
@@ -125,7 +143,7 @@ void Clipper::set_mode(ClipMode p_mode, bool reuse_solution) {
             } break;
 
             case MODE_TRIANGULATE: {
-                ct.AddPaths(solution_closed, path_type, open);
+                ct.AddPaths(solution_closed, path_type, false);
             } break;
         }
     }
@@ -168,8 +186,8 @@ void Clipper::_bind_methods() {
     ClassDB::bind_method(D_METHOD("add_points", "points"), &Clipper::add_points);
     ClassDB::bind_method(D_METHOD("execute"), &Clipper::execute);
 
-    ClassDB::bind_method(D_METHOD("get_solution_count"), &Clipper::get_solution_count);
-    ClassDB::bind_method(D_METHOD("get_solution", "index"), &Clipper::get_solution);
+    ClassDB::bind_method(D_METHOD("get_solution_count", "type"), &Clipper::get_solution_count, DEFVAL(TYPE_CLOSED));
+    ClassDB::bind_method(D_METHOD("get_solution", "index", "type"), &Clipper::get_solution, DEFVAL(TYPE_CLOSED));
 
     ClassDB::bind_method(D_METHOD("clear"), &Clipper::clear);
 
@@ -227,6 +245,10 @@ void Clipper::_bind_methods() {
     BIND_ENUM_CONSTANT(MODE_CLIP);
     BIND_ENUM_CONSTANT(MODE_OFFSET);
     BIND_ENUM_CONSTANT(MODE_TRIANGULATE);
+
+    BIND_ENUM_CONSTANT(TYPE_CLOSED);
+    BIND_ENUM_CONSTANT(TYPE_OPEN);
+    BIND_ENUM_CONSTANT(TYPE_HIERARCHY);
 
     BIND_ENUM_CONSTANT(ctNone);
     BIND_ENUM_CONSTANT(ctIntersection);

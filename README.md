@@ -11,6 +11,9 @@ Currently you'll find three Clipper modules combined:
 * ClipperOffset - inflates/deflates polygons
 * ClipperTri - triangulates clipping solution (polygons)
 
+For any information regarding the library itself please refer to the official
+[documentation](http://www.angusj.com/delphi/clipper/documentation/Docs/Units/ClipperLib/_Body.htm) page (not up to date with the latest version though).
+
 ## Installation
 
 ```bash
@@ -63,7 +66,7 @@ clipper.execute()
 
 ## Todo
 
-- [ ] Add ability to construct PolyPaths (polygon hierarchy, boundary/holes);
+- [ ] Add ability to construct PolyPaths (polygon hierarchy, boundary/holes)
 - [x] Easy mode switching
 
 ## Notice

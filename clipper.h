@@ -15,6 +15,12 @@ enum ClipMode {
     MODE_TRIANGULATE
 };
 
+enum SolutionType {
+    TYPE_CLOSED,
+    TYPE_OPEN,
+    TYPE_HIERARCHY // reserved for future implementation
+};
+
 class Clipper : public Reference {
     GDCLASS(Clipper, Reference);
 
@@ -28,8 +34,8 @@ public:
     void add_points(const Vector<Vector2>& points);
     void execute();
 
-    int get_solution_count() const;
-    Vector<Vector2> get_solution(int idx);
+    int get_solution_count(SolutionType type = TYPE_CLOSED) const;
+    Vector<Vector2> get_solution(int idx, SolutionType type = TYPE_CLOSED);
 
     Rect2 get_bounds();
     void clear();
@@ -98,6 +104,7 @@ private:
 };
 
 VARIANT_ENUM_CAST(ClipMode);
+VARIANT_ENUM_CAST(SolutionType);
 
 VARIANT_ENUM_CAST(cl::ClipType);
 VARIANT_ENUM_CAST(cl::PathType);
