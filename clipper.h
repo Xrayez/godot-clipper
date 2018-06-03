@@ -43,7 +43,15 @@ public:
     int get_solution_count(SolutionType type = TYPE_CLOSED) const;
     Vector<Vector2> get_solution(int idx, SolutionType type = TYPE_CLOSED);
 
+    // Full hierarchy
+
+    int get_child_count(int idx);
+    Vector<Vector2> get_child(int idx, int child_idx);
+    Vector<Vector2> get_parent(int idx);
+    bool is_hole(int idx);
     Dictionary get_hierarchy(int idx);
+
+    // Two-level hierarchy (boundary with holes)
 
     // int get_boundary_count() const;
     // Vector<Vector2> get_boundary(int idx);

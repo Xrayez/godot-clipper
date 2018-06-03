@@ -124,6 +124,45 @@ Dictionary Clipper::get_hierarchy(int idx) {
     return hierarchy;
 }
 
+int Clipper::get_child_count(int idx) {
+
+    ERR_FAIL_INDEX_V(idx, polypaths.size(), -1);
+
+    cl::PolyPath* path = polypaths[idx];
+
+    return path->ChildCount();
+}
+
+Vector<Vector2> Clipper::get_child(int idx, int child_idx) {
+
+    ERR_FAIL_INDEX_V(idx, polypaths.size(), Vector<Vector2>());
+    ERR_FAIL_INDEX_V(child_idx, polypaths[idx]->ChildCount(), Vector<Vector2>());
+
+    cl::PolyPath* path = polypaths[idx];
+    cl::PolyPath& child = path->GetChild(child_idx);
+
+    return _scale_down(child.GetPath(), PRECISION);
+}
+
+Vector<Vector2> Clipper::get_parent(int idx) {
+
+    ERR_FAIL_INDEX_V(idx, polypaths.size(), Vector<Vector2>());
+
+    cl::PolyPath* path = polypaths[idx];
+    cl::PolyPath* parent = path->GetParent();
+
+    return _scale_down(parent->GetPath(), PRECISION);
+}
+
+bool Clipper::is_hole(int idx) {
+
+    ERR_FAIL_INDEX_V(idx, polypaths.size(), false);
+
+    cl::PolyPath* path = polypaths[idx];
+
+    return path->IsHole();
+}
+
 int Clipper::get_solution_count(SolutionType type) const {
 
     switch(type) {
@@ -308,7 +347,11 @@ void Clipper::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_solution_count", "type"), &Clipper::get_solution_count, DEFVAL(TYPE_CLOSED));
     ClassDB::bind_method(D_METHOD("get_solution", "index", "type"), &Clipper::get_solution, DEFVAL(TYPE_CLOSED));
 
-    ClassDB::bind_method(D_METHOD("get_hierarchy", "index"), &Clipper::get_hierarchy);
+    ClassDB::bind_method(D_METHOD("get_child_count", "idx"), &Clipper::get_child_count);
+    ClassDB::bind_method(D_METHOD("get_child", "idx", "child_idx"), &Clipper::get_child);
+    ClassDB::bind_method(D_METHOD("get_parent", "idx"), &Clipper::get_parent);
+    ClassDB::bind_method(D_METHOD("is_hole", "idx"), &Clipper::is_hole);
+    ClassDB::bind_method(D_METHOD("get_hierarchy", "idx"), &Clipper::get_hierarchy);
 
     // ClassDB::bind_method(D_METHOD("get_boundary", "index"), &Clipper::get_boundary);
     // ClassDB::bind_method(D_METHOD("get_hole", "boundary_index", "hole_index"), &Clipper::get_hole);
