@@ -43,7 +43,7 @@ public:
     int get_solution_count(SolutionType type = TYPE_CLOSED) const;
     Vector<Vector2> get_solution(int idx, SolutionType type = TYPE_CLOSED);
 
-    // Vector<int> get_hierarchy(int idx) const;
+    Dictionary get_hierarchy(int idx);
 
     // int get_boundary_count() const;
     // Vector<Vector2> get_boundary(int idx);
@@ -114,8 +114,9 @@ private:
     cl::Paths solution_closed;
     cl::Paths solution_open;
 
+    cl::PolyPath root;
     Vector<cl::PolyPath*> polypaths;
-    Vector<Vector<cl::PolyPath*>> hierarchy;
+    Map<cl::PolyPath*, int> path_map;
 
     cl::Clipper cl;
     cl::ClipperOffset co;

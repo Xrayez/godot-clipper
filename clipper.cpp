@@ -33,25 +33,22 @@ void Clipper::add_points(const Vector<Vector2>& points) {
 
 void Clipper::execute(bool build_hierarchy) {
 
+    ERR_EXPLAIN("Cannot build hierarchy outside of MODE_CLIP");
+    ERR_FAIL_COND(build_hierarchy && mode != MODE_CLIP)
+
     switch(mode) {
 
         case MODE_CLIP: {
 
             if(build_hierarchy) {
-
-                cl::PolyPath polypath;
-                cl.Execute(clip_type, polypath, solution_open, fill_rule);
-                _build_hierarchy(polypath);
+                cl.Execute(clip_type, root, solution_open, fill_rule);
+                _build_hierarchy(root);
             }
             else {
                 cl.Execute(clip_type, solution_closed, solution_open, fill_rule);
             }
-
         } break;
 
-        if(build_hierarchy) {
-            WARN_PRINT("Cannot build hierarchy outside of MODE_CLIP");
-        }
         case MODE_OFFSET: {
             co.Execute(solution_closed, delta * PRECISION);
         } break;
@@ -62,65 +59,70 @@ void Clipper::execute(bool build_hierarchy) {
     }
 }
 
-void Clipper::_build_hierarchy(cl::PolyPath& polypath) {
+void Clipper::_build_hierarchy(cl::PolyPath& root) {
 
     solution_closed.clear();
     polypaths.clear();
-    hierarchy.clear();
 
     List<cl::PolyPath*> to_visit;
-    to_visit.push_back(&polypath);
+    to_visit.push_back(&root);
 
-    for(int idx = 0; !to_visit.empty(); ++idx) {
+    for(int idx = -1; !to_visit.empty(); ++idx) {
 
-        cl::PolyPath* parent = to_visit.front()->get();
-        to_visit.pop_front();
-
-        Vector<cl::PolyPath*> paths;
-        paths.push_back(parent);
+        cl::PolyPath* parent = to_visit.back()->get();
+        to_visit.pop_back();
 
         for(int c = 0; c < parent->ChildCount(); ++c) {
 
             cl::PolyPath& child = parent->GetChild(c);
             to_visit.push_back(&child);
-
-            paths.push_back(&child);
         }
-        solution_closed.push_back(parent->GetPath());
-        polypaths.push_back(parent);
-        hierarchy.push_back(paths);
+        if(idx != -1) {
+            // Ignore root (used as container only, has no boundary)
+            solution_closed.push_back(parent->GetPath());
+            polypaths.push_back(parent);
+            path_map[parent] = idx;
+        }
     }
-    print_line(itos(hierarchy.size()));
-    print_line(itos(solution_closed.size()));
-    ERR_FAIL_COND(hierarchy.size() != solution_closed.size())
 }
 
 void Clipper::clear() {
 
     solution_closed.clear();
     solution_open.clear();
-    polypaths.clear();
 
-    hierarchy.clear();
+    root.Clear();
+    polypaths.clear();
+    path_map.clear();
 
     cl.Clear();
     co.Clear();
     ct.Clear();
 }
 
-// Vector<int> Clipper::get_hierarchy(int idx) const {
+Dictionary Clipper::get_hierarchy(int idx) {
 
-//     ERR_FAIL_INDEX_V(idx, hierarchy.size(), Vector<int>());
+    ERR_FAIL_INDEX_V(idx, polypaths.size(), Dictionary());
 
-//     const Vector<cl::PolyPath>& paths = hierarchy[idx];
-//     Vector<int> indices;
-//     indices.resize(paths.size());
+    cl::PolyPath* path = polypaths[idx];
 
-//     for(int i = 0; i < paths.size(); ++i) {
-//         indices[i] = polypaths.find(paths[i]);
-//     }
-//     return indices;
-// }
+    // Parent
+    cl::PolyPath* parent = path->GetParent();
+
+    // Children
+    Vector<int> children;
+    for(int c = 0; c < path->ChildCount(); ++c) {
+
+        cl::PolyPath& child = path->GetChild(c);
+        children.push_back( path_map[&child] );
+    }
+
+    Dictionary hierarchy;
+    hierarchy["parent"] = path_map[parent];
+    hierarchy["children"] = children;
+
+    return hierarchy;
+}
 
 int Clipper::get_solution_count(SolutionType type) const {
 
@@ -306,7 +308,7 @@ void Clipper::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_solution_count", "type"), &Clipper::get_solution_count, DEFVAL(TYPE_CLOSED));
     ClassDB::bind_method(D_METHOD("get_solution", "index", "type"), &Clipper::get_solution, DEFVAL(TYPE_CLOSED));
 
-    // ClassDB::bind_method(D_METHOD("get_hierarchy", "index"), &Clipper::get_hierarchy);
+    ClassDB::bind_method(D_METHOD("get_hierarchy", "index"), &Clipper::get_hierarchy);
 
     // ClassDB::bind_method(D_METHOD("get_boundary", "index"), &Clipper::get_boundary);
     // ClassDB::bind_method(D_METHOD("get_hole", "boundary_index", "hole_index"), &Clipper::get_hole);

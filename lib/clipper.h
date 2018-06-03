@@ -90,6 +90,8 @@ class PolyPath
 	  Path& GetPath();
 	  bool IsHole() const;
 	  void Clear();
+
+    inline bool operator<(const PolyPath* p) const { return this < p; }
 };
 
 struct Rect64 {
