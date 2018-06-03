@@ -17,9 +17,15 @@ enum ClipMode {
 
 enum SolutionType {
     TYPE_CLOSED,
-    TYPE_OPEN,
-    TYPE_HIERARCHY // reserved for future implementation
+    TYPE_OPEN
 };
+
+// struct PolyKey {
+//     cl::PolyPath poly;
+//     int idx;
+//     PolyKey() {};
+//     PolyKey(const cl::PolyPath& p, int i) : poly(p), idx(i) {};
+// };
 
 class Clipper : public Reference {
     GDCLASS(Clipper, Reference);
@@ -32,10 +38,18 @@ public:
 //------------------------------------------------------------------------------
 
     void add_points(const Vector<Vector2>& points);
-    void execute();
+    void execute(bool build_hierarchy = false);
 
     int get_solution_count(SolutionType type = TYPE_CLOSED) const;
     Vector<Vector2> get_solution(int idx, SolutionType type = TYPE_CLOSED);
+
+    // Vector<int> get_hierarchy(int idx) const;
+
+    // int get_boundary_count() const;
+    // Vector<Vector2> get_boundary(int idx);
+
+    // int get_hole_count(int idx, int hole_idx);
+    // Vector<Vector2> get_hole(int idx, int hole_idx);
 
     Rect2 get_bounds();
     void clear();
@@ -81,10 +95,12 @@ public:
 protected:
     static void  _bind_methods();
 
-private:
     cl::Path _scale_up(const Vector<Vector2>& points, real_t scale);
     Vector<Vector2> _scale_down(const cl::Path& path, real_t scale);
 
+    void _build_hierarchy(cl::PolyPath& polypath);
+
+private:
     bool open;
     cl::PathType path_type;
     cl::ClipType clip_type;
@@ -97,6 +113,9 @@ private:
 
     cl::Paths solution_closed;
     cl::Paths solution_open;
+
+    Vector<cl::PolyPath*> polypaths;
+    Vector<Vector<cl::PolyPath*>> hierarchy;
 
     cl::Clipper cl;
     cl::ClipperOffset co;

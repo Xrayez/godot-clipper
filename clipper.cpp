@@ -31,14 +31,27 @@ void Clipper::add_points(const Vector<Vector2>& points) {
     }
 }
 
-void Clipper::execute() {
+void Clipper::execute(bool build_hierarchy) {
 
     switch(mode) {
 
         case MODE_CLIP: {
-            cl.Execute(clip_type, solution_closed, solution_open, fill_rule);
+
+            if(build_hierarchy) {
+
+                cl::PolyPath polypath;
+                cl.Execute(clip_type, polypath, solution_open, fill_rule);
+                _build_hierarchy(polypath);
+            }
+            else {
+                cl.Execute(clip_type, solution_closed, solution_open, fill_rule);
+            }
+
         } break;
 
+        if(build_hierarchy) {
+            WARN_PRINT("Cannot build hierarchy outside of MODE_CLIP");
+        }
         case MODE_OFFSET: {
             co.Execute(solution_closed, delta * PRECISION);
         } break;
@@ -49,15 +62,65 @@ void Clipper::execute() {
     }
 }
 
+void Clipper::_build_hierarchy(cl::PolyPath& polypath) {
+
+    solution_closed.clear();
+    polypaths.clear();
+    hierarchy.clear();
+
+    List<cl::PolyPath*> to_visit;
+    to_visit.push_back(&polypath);
+
+    for(int idx = 0; !to_visit.empty(); ++idx) {
+
+        cl::PolyPath* parent = to_visit.front()->get();
+        to_visit.pop_front();
+
+        Vector<cl::PolyPath*> paths;
+        paths.push_back(parent);
+
+        for(int c = 0; c < parent->ChildCount(); ++c) {
+
+            cl::PolyPath& child = parent->GetChild(c);
+            to_visit.push_back(&child);
+
+            paths.push_back(&child);
+        }
+        solution_closed.push_back(parent->GetPath());
+        polypaths.push_back(parent);
+        hierarchy.push_back(paths);
+    }
+    print_line(itos(hierarchy.size()));
+    print_line(itos(solution_closed.size()));
+    ERR_FAIL_COND(hierarchy.size() != solution_closed.size())
+}
+
 void Clipper::clear() {
 
     solution_closed.clear();
     solution_open.clear();
+    polypaths.clear();
+
+    hierarchy.clear();
 
     cl.Clear();
     co.Clear();
     ct.Clear();
 }
+
+// Vector<int> Clipper::get_hierarchy(int idx) const {
+
+//     ERR_FAIL_INDEX_V(idx, hierarchy.size(), Vector<int>());
+
+//     const Vector<cl::PolyPath>& paths = hierarchy[idx];
+//     Vector<int> indices;
+//     indices.resize(paths.size());
+
+//     for(int i = 0; i < paths.size(); ++i) {
+//         indices[i] = polypaths.find(paths[i]);
+//     }
+//     return indices;
+// }
 
 int Clipper::get_solution_count(SolutionType type) const {
 
@@ -70,12 +133,6 @@ int Clipper::get_solution_count(SolutionType type) const {
         case TYPE_OPEN: {
             return solution_open.size();
         } break;
-
-        case TYPE_HIERARCHY: {
-            ERR_EXPLAIN("TYPE_HIERARCHY reserved for future implementation");
-            ERR_FAIL_V(-1);
-            // to be implemented
-        }
     }
     return -1;
 }
@@ -99,15 +156,57 @@ Vector<Vector2> Clipper::get_solution(int idx, SolutionType type) {
 
             return _scale_down(solution_open[idx], PRECISION);
         } break;
-
-        case TYPE_HIERARCHY: {
-            ERR_EXPLAIN("TYPE_HIERARCHY reserved for future implementation");
-            ERR_FAIL_V(Vector<Vector2>());
-            // to be implemented
-        }
     }
     return Vector<Vector2>();
 }
+
+// int Clipper::get_boundary_count() const {
+
+//     return hierarchy.size();
+// }
+
+// Vector<Vector2> Clipper::get_boundary(int idx) {
+
+//     ERR_FAIL_INDEX_V(idx, polypaths.size(), Vector<Vector2>());
+
+//     return _scale_down(polypaths[idx].GetPath(), PRECISION);
+// }
+
+// int Clipper::get_hole_count(int idx) {
+
+//     ERR_FAIL_INDEX_V(idx, polypaths.size(), -1);
+
+//     cl::PolyPath& parent = polypaths[idx];
+
+//     int hole_count = 0;
+
+//     for(int h = 0; h < boundary.ChildCount(); ++h) {
+
+//         if(boundary.GetChild(h).IsHole()) {
+//             ++hole_count;
+//         }
+//     }
+//     return count;
+// }
+
+// Vector<Vector2> Clipper::get_hole(int idx, int hole_idx) {
+
+//     ERR_FAIL_INDEX_V(idx, polypaths.size(), Vector<Vector2>());
+//     ERR_FAIL_INDEX_V(hole_idx, polypaths[idx].ChildCount(), Vector<Vector2>());
+
+//     cl::PolyPath& boundary = polypaths[idx];
+
+//     int hole_count = 0;
+
+//     for(int h = hole_idx; h < boundary.ChildCount(); ++h) {
+
+//         if(boundary.GetChild(h).IsHole()) {
+//             ++hole_count;
+//         }
+//     }
+
+//     return _scale_down(polypaths[idx].GetChild(hole_idx).GetPath(), PRECISION);
+// }
 
 Rect2 Clipper::get_bounds() {
 
@@ -202,10 +301,15 @@ void Clipper::_bind_methods() {
 //------------------------------------------------------------------------------
 
     ClassDB::bind_method(D_METHOD("add_points", "points"), &Clipper::add_points);
-    ClassDB::bind_method(D_METHOD("execute"), &Clipper::execute);
+    ClassDB::bind_method(D_METHOD("execute", "build_hierarchy"), &Clipper::execute, DEFVAL(false));
 
     ClassDB::bind_method(D_METHOD("get_solution_count", "type"), &Clipper::get_solution_count, DEFVAL(TYPE_CLOSED));
     ClassDB::bind_method(D_METHOD("get_solution", "index", "type"), &Clipper::get_solution, DEFVAL(TYPE_CLOSED));
+
+    // ClassDB::bind_method(D_METHOD("get_hierarchy", "index"), &Clipper::get_hierarchy);
+
+    // ClassDB::bind_method(D_METHOD("get_boundary", "index"), &Clipper::get_boundary);
+    // ClassDB::bind_method(D_METHOD("get_hole", "boundary_index", "hole_index"), &Clipper::get_hole);
 
     ClassDB::bind_method(D_METHOD("clear"), &Clipper::clear);
 
@@ -266,7 +370,6 @@ void Clipper::_bind_methods() {
 
     BIND_ENUM_CONSTANT(TYPE_CLOSED);
     BIND_ENUM_CONSTANT(TYPE_OPEN);
-    BIND_ENUM_CONSTANT(TYPE_HIERARCHY);
 
     BIND_ENUM_CONSTANT(ctNone);
     BIND_ENUM_CONSTANT(ctIntersection);
