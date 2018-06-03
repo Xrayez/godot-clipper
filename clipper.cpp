@@ -347,11 +347,6 @@ void Clipper::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::REAL, "delta"), "set_delta", "get_delta");
 
 //------------------------------------------------------------------------------
-// Meta methods
-//------------------------------------------------------------------------------
-    ClassDB::bind_method(D_METHOD("get_version"), &Clipper::get_version);
-
-//------------------------------------------------------------------------------
 // Enums
 //------------------------------------------------------------------------------
     using namespace clipperlib;

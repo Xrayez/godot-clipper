@@ -20,13 +20,6 @@ enum SolutionType {
     TYPE_OPEN
 };
 
-// struct PolyKey {
-//     cl::PolyPath poly;
-//     int idx;
-//     PolyKey() {};
-//     PolyKey(const cl::PolyPath& p, int i) : poly(p), idx(i) {};
-// };
-
 class Clipper : public Reference {
     GDCLASS(Clipper, Reference);
 
@@ -87,10 +80,6 @@ public:
     real_t get_delta() const { return delta; }
 
 //------------------------------------------------------------------------------
-// Meta methods
-//------------------------------------------------------------------------------
-    String get_version() const { return CLIPPER_VERSION; }
-
 protected:
     static void  _bind_methods();
 
