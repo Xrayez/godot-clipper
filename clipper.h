@@ -87,7 +87,7 @@ protected:
     cl::Path _scale_up(const Vector<Vector2>& points, real_t scale);
     Vector<Vector2> _scale_down(const cl::Path& path, real_t scale);
 
-    void _build_hierarchy(cl::PolyPath& polypath);
+    void _build_hierarchy(cl::PolyPath& p_root);
 
 private:
     bool open;

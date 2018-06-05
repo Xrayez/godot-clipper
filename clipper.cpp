@@ -220,13 +220,13 @@ Dictionary Clipper::get_hierarchy(int idx) {
     return hierarchy;
 }
 
-void Clipper::_build_hierarchy(cl::PolyPath& root) {
+void Clipper::_build_hierarchy(cl::PolyPath& p_root) {
 
     solution_closed.clear();
     polypaths.clear();
 
     List<cl::PolyPath*> to_visit;
-    to_visit.push_back(&root);
+    to_visit.push_back(&p_root);
 
     for(int idx = -1; !to_visit.empty(); ++idx) {
 
@@ -238,8 +238,9 @@ void Clipper::_build_hierarchy(cl::PolyPath& root) {
             cl::PolyPath& child = parent->GetChild(c);
             to_visit.push_back(&child);
         }
+        // Ignore root (used as container only, has no boundary)
         if(idx != -1) {
-            // Ignore root (used as container only, has no boundary)
+            // Rely on order
             solution_closed.push_back(parent->GetPath());
             polypaths.push_back(parent);
             path_map[parent] = idx;
