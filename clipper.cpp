@@ -161,6 +161,22 @@ Vector<Vector2> Clipper::get_child(int idx, int child_idx) {
     return _scale_down(child.GetPath(), PRECISION);
 }
 
+Array Clipper::get_children(int idx) {
+
+    ERR_FAIL_INDEX_V(idx, polypaths.size(), Array());
+
+    cl::PolyPath* path = polypaths[idx];
+
+    Array children;
+
+    for(int c = 0; c < path->ChildCount(); ++c) {
+
+        cl::PolyPath& child = path->GetChild(c);
+        children.push_back( _scale_down(child.GetPath(), PRECISION) );
+    }
+    return children;
+}
+
 Vector<Vector2> Clipper::get_parent(int idx) {
 
     ERR_FAIL_INDEX_V(idx, polypaths.size(), Vector<Vector2>());
@@ -299,11 +315,13 @@ void Clipper::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_solution_count", "type"), &Clipper::get_solution_count, DEFVAL(TYPE_CLOSED));
     ClassDB::bind_method(D_METHOD("get_solution", "index", "type"), &Clipper::get_solution, DEFVAL(TYPE_CLOSED));
 
-    ClassDB::bind_method(D_METHOD("clear"), &Clipper::clear);
     ClassDB::bind_method(D_METHOD("get_bounds"), &Clipper::get_bounds);
+    ClassDB::bind_method(D_METHOD("clear"), &Clipper::clear);
 
+    // Hierarchy
     ClassDB::bind_method(D_METHOD("get_child_count", "idx"), &Clipper::get_child_count);
     ClassDB::bind_method(D_METHOD("get_child", "idx", "child_idx"), &Clipper::get_child);
+    ClassDB::bind_method(D_METHOD("get_children", "idx"), &Clipper::get_children);
     ClassDB::bind_method(D_METHOD("get_parent", "idx"), &Clipper::get_parent);
     ClassDB::bind_method(D_METHOD("is_hole", "idx"), &Clipper::is_hole);
     ClassDB::bind_method(D_METHOD("get_hierarchy", "idx"), &Clipper::get_hierarchy);

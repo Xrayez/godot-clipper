@@ -42,6 +42,7 @@ public:
     // Hierarchy
     int get_child_count(int idx);
     Vector<Vector2> get_child(int idx, int child_idx);
+    Array get_children(int idx);
     Vector<Vector2> get_parent(int idx);
     bool is_hole(int idx);
     Dictionary get_hierarchy(int idx);
