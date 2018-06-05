@@ -11,6 +11,10 @@ Clipper::Clipper(): mode(MODE_CLIP),
                     clip_type(cl::ctUnion),
                     delta(0.0) {}
 
+//------------------------------------------------------------------------------
+// Clipping methods
+//------------------------------------------------------------------------------
+
 void Clipper::add_points(const Vector<Vector2>& points) {
 
     const cl::Path& path = _scale_up(points, PRECISION);
@@ -141,13 +145,36 @@ void Clipper::clear() {
     ct.Clear();
 }
 
-int Clipper::get_child_count(int idx) {
+Vector<int> Clipper::get_hierarchy(int idx) {
 
-    ERR_FAIL_INDEX_V(idx, polypaths.size(), -1);
+    ERR_FAIL_INDEX_V(idx, polypaths.size(), Vector<int>());
 
+    // Returns indices to parent and children of the selected solution
+
+    Vector<int> hierarchy;
     cl::PolyPath* path = polypaths[idx];
 
-    return path->ChildCount();
+    // Parent
+    cl::PolyPath* parent = path->GetParent();
+    hierarchy.push_back( path_map[parent] );
+
+    // Children
+    for(int c = 0; c < path->ChildCount(); ++c) {
+
+        cl::PolyPath& child = path->GetChild(c);
+        hierarchy.push_back( path_map[&child] );
+    }
+    return hierarchy;
+}
+
+Vector<Vector2> Clipper::get_parent(int idx) {
+
+    ERR_FAIL_INDEX_V(idx, polypaths.size(), Vector<Vector2>());
+
+    cl::PolyPath* path = polypaths[idx];
+    cl::PolyPath* parent = path->GetParent();
+
+    return _scale_down(parent->GetPath(), PRECISION);
 }
 
 Vector<Vector2> Clipper::get_child(int idx, int child_idx) {
@@ -159,6 +186,15 @@ Vector<Vector2> Clipper::get_child(int idx, int child_idx) {
     cl::PolyPath& child = path->GetChild(child_idx);
 
     return _scale_down(child.GetPath(), PRECISION);
+}
+
+int Clipper::get_child_count(int idx) {
+
+    ERR_FAIL_INDEX_V(idx, polypaths.size(), -1);
+
+    cl::PolyPath* path = polypaths[idx];
+
+    return path->ChildCount();
 }
 
 Array Clipper::get_children(int idx) {
@@ -177,16 +213,6 @@ Array Clipper::get_children(int idx) {
     return children;
 }
 
-Vector<Vector2> Clipper::get_parent(int idx) {
-
-    ERR_FAIL_INDEX_V(idx, polypaths.size(), Vector<Vector2>());
-
-    cl::PolyPath* path = polypaths[idx];
-    cl::PolyPath* parent = path->GetParent();
-
-    return _scale_down(parent->GetPath(), PRECISION);
-}
-
 bool Clipper::is_hole(int idx) {
 
     ERR_FAIL_INDEX_V(idx, polypaths.size(), false);
@@ -195,31 +221,7 @@ bool Clipper::is_hole(int idx) {
 
     return path->IsHole();
 }
-
-Dictionary Clipper::get_hierarchy(int idx) {
-
-    ERR_FAIL_INDEX_V(idx, polypaths.size(), Dictionary());
-
-    cl::PolyPath* path = polypaths[idx];
-
-    // Parent
-    cl::PolyPath* parent = path->GetParent();
-
-    // Children
-    Vector<int> children;
-    for(int c = 0; c < path->ChildCount(); ++c) {
-
-        cl::PolyPath& child = path->GetChild(c);
-        children.push_back( path_map[&child] );
-    }
-
-    Dictionary hierarchy;
-    hierarchy["parent"] = path_map[parent];
-    hierarchy["children"] = children;
-
-    return hierarchy;
-}
-
+//------------------------------------------------------------------------------
 void Clipper::_build_hierarchy(cl::PolyPath& p_root) {
 
     solution_closed.clear();

@@ -40,12 +40,14 @@ public:
     void clear();
 
     // Hierarchy
-    int get_child_count(int idx);
-    Vector<Vector2> get_child(int idx, int child_idx);
-    Array get_children(int idx);
+    Vector<int> get_hierarchy(int idx);
+
     Vector<Vector2> get_parent(int idx);
+    Vector<Vector2> get_child(int idx, int child_idx);
+    int get_child_count(int idx);
+    Array get_children(int idx);
+
     bool is_hole(int idx);
-    Dictionary get_hierarchy(int idx);
 
 //------------------------------------------------------------------------------
 // Configuration methods

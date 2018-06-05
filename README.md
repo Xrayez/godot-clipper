@@ -66,7 +66,7 @@ clipper.execute()
 
 ## Todo
 
-- [ ] Add ability to construct PolyPaths (polygon hierarchy, boundary/holes)
+- [ ] Add ability to construct PolyPaths (~~polygon hierarchy~~, boundary/holes)
 - [x] Easy mode switching
 
 ## Notice
