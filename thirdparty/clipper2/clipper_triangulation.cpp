@@ -8,13 +8,14 @@
 * License   : http://www.boost.org/LICENSE_1_0.txt                             *
 *******************************************************************************/
 
+#include "core/error_macros.h"
+
 #include <stdlib.h>
 #include <cmath>
 #include <vector>
 #include <algorithm>
 #include "clipper_triangulation.h"
 #include "clipper.h"
-#include "../reference.h"
 
 namespace clipperlib {
 
@@ -311,10 +312,9 @@ namespace clipperlib {
   void ClipperTri::BuildResult(Paths &paths) {
     paths.clear();
     paths.reserve(triangles_.size());
-    for (Paths::const_iterator iter = triangles_.cbegin();
-      iter != triangles_.cend(); ++iter) {
-      ERR_FAIL_COND((*iter).size() != 3);
-      paths.push_back(*iter);
+    for (Paths::iterator it = triangles_.begin(); it != triangles_.end(); ++it) {
+      ERR_FAIL_COND((*it).size() != 3);
+      paths.push_back(*it);
     }
   }
   //------------------------------------------------------------------------------

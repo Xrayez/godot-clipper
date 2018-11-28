@@ -49,18 +49,6 @@ struct Point64 {
   inline Point64 operator+(const Point64 &b) const {
     return Point64(x + b.x, y + b.y);
   }
-  inline void operator+=(const Point64 &b) {
-    x += b.x;
-    y += b.y;
-  }
-  inline void operator/=(const Point64 &b) {
-    x /= b.x;
-    y /= b.y;
-  }
-  inline void operator/=(const int64_t& d) {
-    x /= d;
-    y /= d;
-  }
 };
 
 typedef std::vector< Point64 > Path;
@@ -232,17 +220,6 @@ class Clipper {
 //------------------------------------------------------------------------------
 
 #define CLIPPER_HORIZONTAL (-DBL_MAX)
-
-class ClipperException : public std::exception
-{
-  public:
-    ClipperException(const char* description): descr_(description) {}
-    virtual ~ClipperException() throw() {}
-    virtual const char* what() const throw() {return descr_.c_str();}
-  private:
-    std::string descr_;
-};
-//------------------------------------------------------------------------------
 
 } //clipperlib namespace
 
