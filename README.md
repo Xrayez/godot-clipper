@@ -2,7 +2,19 @@
 
 # Work in progress!
 
-This is a wrapper for the popular polygon clipping library originally written by
+This is only a preview. The library is currently undergoing a rewrite by the
+original author, so expect API to be changed at any point in this module.
+
+This is not Clipper 6.4.2!
+The code is taken from
+[Clipper2](https://sourceforge.net/p/polyclipping/code/HEAD/tree/sandbox/Clipper2/)
+sandbox, which adds additional support for robust polygon triangulation.
+
+---
+
+## Descriptiton
+
+This is a wrapper for the popular polygon clipping library written by
 Angus Johnson: [Clipper](https://sourceforge.net/projects/polyclipping/)
 
 Currently you'll find three Clipper modules combined:
@@ -63,15 +75,3 @@ clipper.execute()
 ### Result
 
 ![Clipping solution](examples/images/solution.png)
-
-## Todo
-
-- [ ] Add ability to construct PolyPaths (~~polygon hierarchy~~, boundary/holes)
-- [x] Easy mode switching
-
-## Notice
-
-This is not Clipper 6.4.2!
-
-The code is taken from [Clipper2](https://sourceforge.net/p/polyclipping/code/HEAD/tree/sandbox/Clipper2/)
-sandbox (currently beta), which adds additional support for robust polygon triangulation.
