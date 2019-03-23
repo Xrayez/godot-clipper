@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://clipper.gd" type="Script" id=1]
+[ext_resource path="res://brush.gd" type="Script" id=2]
+
+[node name="clipper" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="brush" type="Node2D" parent="."]
+script = ExtResource( 2 )
+size = 256
+
+[node name="operation" type="OptionButton" parent="."]
+margin_right = 41.0
+margin_bottom = 20.0
+text = "Union"
+items = [ "Union", null, false, -1, null, "Difference", null, false, -1, null, "Intersection", null, false, -1, null, "Xor", null, false, -1, null ]
+selected = 0
+[connection signal="item_selected" from="operation" to="." method="_on_operation_item_selected"]
