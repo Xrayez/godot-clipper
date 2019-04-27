@@ -1,6 +1,11 @@
 Import('env')
 
-module_env = env.Clone()
+env_module = env.Clone()
 
-module_env.add_source_files(env.modules_sources,"*.cpp")
-module_env.add_source_files(env.modules_sources,"thirdparty/clipper2/*.cpp")
+# Thirdparty sources
+env_thirdparty = env_module.Clone()
+env_thirdparty.disable_warnings()
+env_thirdparty.add_source_files(env.modules_sources, 'thirdparty/clipper2/*.cpp')
+
+# Module sources
+env_module.add_source_files(env.modules_sources, '*.cpp')
