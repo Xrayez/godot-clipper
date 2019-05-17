@@ -19,5 +19,23 @@ margin_bottom = 53.0
 text = "Union"
 items = [ "Union", null, false, 0, null, "Difference", null, false, 1, null, "Intersection", null, false, 2, null, "Xor", null, false, 3, null ]
 selected = 0
+
+[node name="join_type" type="OptionButton" parent="."]
+margin_top = 71.0
+margin_right = 79.0
+margin_bottom = 91.0
+text = "Join Type"
+items = [ "Square", null, false, 0, null, "Round", null, false, 1, null, "Miter", null, false, 2, null ]
+selected = 0
+
+[node name="end_type" type="OptionButton" parent="."]
+margin_top = 109.0
+margin_right = 98.0
+margin_bottom = 129.0
+text = "End Type"
+items = [ "Polygon", null, false, 0, null, "Open Joined", null, false, 1, null, "Open Butt", null, false, 2, null, "Open Square", null, false, 3, null, "Open Round", null, false, 4, null ]
+selected = 0
 [connection signal="item_selected" from="mode" to="." method="_on_mode_selected"]
 [connection signal="item_selected" from="operation" to="." method="_on_operation_selected"]
+[connection signal="item_selected" from="join_type" to="." method="_on_join_type_selected"]
+[connection signal="item_selected" from="end_type" to="." method="_on_end_type_selected"]

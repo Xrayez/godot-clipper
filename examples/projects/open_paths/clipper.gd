@@ -1,6 +1,6 @@
 extends Node2D
 
-const DRAW_OFFSET = Vector2(50, 50)
+const DRAW_OFFSET = Vector2(200, 0)
 
 var line = [Vector2(0, 100), Vector2(200, 100), Vector2(200, 200)]
 var rect = [Vector2(50, 50), Vector2(150, 50), Vector2(150, 150), Vector2(50, 150)]
@@ -34,10 +34,6 @@ func test_open_paths():
 
 			# Offset amount
 			clipper.delta = 20.0
-
-			# Creates square "passages" from open path (line):
-			clipper.end_type = Clipper.kOpenSquare
-
 			clipper.add_points(line)
 
 	clipper.execute()
@@ -46,8 +42,6 @@ func test_open_paths():
 
 
 func _draw():
-
-	print(true)
 
 	draw_set_transform(DRAW_OFFSET, 0, Vector2.ONE)
 
@@ -96,5 +90,33 @@ func _on_mode_selected(ID):
 			clipper.set_mode(Clipper.MODE_CLIP, is_reusing_solution)
 		1:
 			clipper.set_mode(Clipper.MODE_OFFSET, is_reusing_solution)
+
+	test_open_paths()
+
+
+func _on_join_type_selected(id):
+	match id:
+		0:
+			clipper.join_type = Clipper.kSquare
+		1:
+			clipper.join_type = Clipper.kRound
+		2:
+			clipper.join_type = Clipper.kMiter
+
+	test_open_paths()
+
+
+func _on_end_type_selected(id):
+	match id:
+		0:
+			clipper.end_type = Clipper.kPolygon
+		1:
+			clipper.end_type = Clipper.kOpenJoined
+		2:
+			clipper.end_type = Clipper.kOpenButt
+		3:
+			clipper.end_type = Clipper.kOpenSquare
+		4:
+			clipper.end_type = Clipper.kOpenRound
 
 	test_open_paths()
