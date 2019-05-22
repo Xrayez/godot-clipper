@@ -28,6 +28,10 @@ For any information regarding the library itself please refer to the official
 
 ## Installation
 
+Before installing, you must be able to 
+[compile Godot Engine](https://docs.godotengine.org/en/latest/development/compiling/) 
+from source.
+
 ```bash
 # Change directory to `modules` subfolder of Godot repository
 cd godot/modules/

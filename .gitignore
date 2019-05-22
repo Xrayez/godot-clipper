@@ -3,5 +3,6 @@
 *.obj
 *.o
 *.pyc
+*.bc
 
 *.import
