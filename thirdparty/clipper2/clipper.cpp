@@ -592,9 +592,7 @@ namespace clipperlib {
   void Clipper::AddPath(const Path &path, PathType polytype, bool is_open)
   {
     if (is_open) {
-      ERR_EXPLAINC("AddPath: Only subject paths may be open.");
-      ERR_FAIL_COND(polytype == ptClip)
-
+      ERR_FAIL_COND_MSG(polytype == ptClip,"AddPath: Only subject paths may be open.")
       has_open_paths_ = true;
     }
     minima_list_sorted_ = false;
@@ -968,8 +966,7 @@ namespace clipperlib {
 
   void Clipper::AddLocalMaxPoly(Active &e1, Active &e2, const Point64 pt)
   {
-    ERR_EXPLAINC("Error in AddLocalMaxPoly().");
-    ERR_FAIL_COND(!IsHotEdge(e2))
+    ERR_FAIL_COND_MSG(!IsHotEdge(e2), "Error in AddLocalMaxPoly().");
 
     AddOutPt(e1, pt);
     if (e1.outrec == e2.outrec) {
@@ -994,8 +991,7 @@ namespace clipperlib {
         SwapSides(*e2.outrec);
       }
       else if (!FixOrientation(e1) && !FixOrientation(e2)) {
-        ERR_EXPLAINC("Error in JoinOutrecPaths()");
-        ERR_FAIL();
+        ERR_FAIL_MSG("Error in JoinOutrecPaths()");
       }
 
       if (e1.outrec->owner == e2.outrec) e1.outrec->owner = e2.outrec->owner;

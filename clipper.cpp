@@ -38,8 +38,7 @@ void Clipper::add_points(const Vector<Vector2> &points) {
 
 void Clipper::execute(bool build_hierarchy) {
 
-	ERR_EXPLAIN("Cannot build hierarchy outside of MODE_CLIP");
-	ERR_FAIL_COND(build_hierarchy && mode != MODE_CLIP)
+	ERR_FAIL_COND_MSG(build_hierarchy && mode != MODE_CLIP, "Cannot build hierarchy outside of MODE_CLIP");
 
 	switch (mode) {
 
@@ -81,20 +80,12 @@ int Clipper::get_solution_count(SolutionType type) const {
 Vector<Vector2> Clipper::get_solution(int idx, SolutionType type) {
 
 	switch (type) {
-
 		case TYPE_CLOSED: {
-
-			ERR_EXPLAIN("Closed solution not found");
-			ERR_FAIL_INDEX_V(idx, solution_closed.size(), Vector<Vector2>());
-
+			ERR_FAIL_INDEX_V_MSG(idx, solution_closed.size(), Vector<Vector2>(), "Closed solution not found");
 			return _scale_down(solution_closed[idx], PRECISION);
 		} break;
-
 		case TYPE_OPEN: {
-
-			ERR_EXPLAIN("Open solution not found");
-			ERR_FAIL_INDEX_V(idx, solution_open.size(), Vector<Vector2>());
-
+			ERR_FAIL_INDEX_V_MSG(idx, solution_open.size(), Vector<Vector2>(), "Open solution not found");
 			return _scale_down(solution_open[idx], PRECISION);
 		} break;
 	}
@@ -103,8 +94,7 @@ Vector<Vector2> Clipper::get_solution(int idx, SolutionType type) {
 
 Rect2 Clipper::get_bounds() {
 
-	ERR_EXPLAIN("Cannot get solution bounds in MODE_OFFSET");
-	ERR_FAIL_COND_V(mode == MODE_OFFSET, Rect2());
+	ERR_FAIL_COND_V_MSG(mode == MODE_OFFSET, Rect2(), "Cannot get solution bounds in MODE_OFFSET");
 
 	cl::Rect64 b(0, 0, 0, 0);
 
