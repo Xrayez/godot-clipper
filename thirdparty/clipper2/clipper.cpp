@@ -592,7 +592,7 @@ namespace clipperlib {
   void Clipper::AddPath(const Path &path, PathType polytype, bool is_open)
   {
     if (is_open) {
-      ERR_FAIL_COND_MSG(polytype == ptClip,"AddPath: Only subject paths may be open.")
+      ERR_FAIL_COND_MSG(polytype == ptClip,"AddPath: Only subject paths may be open.");
       has_open_paths_ = true;
     }
     minima_list_sorted_ = false;
